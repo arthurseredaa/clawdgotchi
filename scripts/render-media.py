@@ -111,7 +111,7 @@ def passport(data):
     grid = data["portrait"]
     draw_grid(d, grid, 36, 40)
     for i, line in enumerate(lines):
-        d.text((260, 30 + i * 24), line, font=f, fill=TEXT if i < 5 else DIM)
+        d.text((260, 40 + i * 24), line, font=f, fill=TEXT)
     im.save(OUT / "passport.png")
 
 

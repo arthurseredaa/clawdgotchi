@@ -156,7 +156,7 @@ async function setUp($) {
     if ((await $.store.get('born')) == null) await $.store.set('born', await $.clock.now())
   } catch {}
   try {
-    await $.command.register({ name: 'clawd', description: 'Паспорт Clawd', immediate: true })
+    await $.command.register({ name: 'clawd', description: 'Show Clawd’s passport', immediate: true })
   } catch {}
 }
 

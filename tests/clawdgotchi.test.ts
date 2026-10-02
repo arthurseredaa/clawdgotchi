@@ -293,11 +293,11 @@ test('/clawd opens a passport that remembers across sessions', async ($, on) => 
     viewport: { columns: 100, rows: 30 },
     props: { title: 'Clawdgotchi', isFocused: true, bodyColumns: 60, placement: 'inline', scroll: { offset: 0, bodyRows: 10 }, view: {} },
   })
-  expect(await pane.find({ type: 'Text', text: 'Вік: народився сьогодні' })).toBeDefined()
-  expect(await pane.find({ type: 'Text', text: 'Сесій: 5' })).toBeDefined()
-  expect(await pane.find({ type: 'Text', text: 'З’їв: 12.4k токенів' })).toBeDefined()
-  expect(await pane.find({ type: 'Text', text: 'Дітей: 1' })).toBeDefined()
-  expect(await pane.find({ type: 'Text', text: 'Годинник Clawd: 14:05' })).toBeDefined()
+  expect(await pane.find({ type: 'Text', text: 'Age: born today' })).toBeDefined()
+  expect(await pane.find({ type: 'Text', text: 'Sessions: 5' })).toBeDefined()
+  expect(await pane.find({ type: 'Text', text: 'Ate: 12.4k tokens' })).toBeDefined()
+  expect(await pane.find({ type: 'Text', text: 'Babies: 1' })).toBeDefined()
+  expect(await pane.find({ type: 'Text', text: /clock/ })).toBeUndefined()
   await pane.unmount()
 })
 

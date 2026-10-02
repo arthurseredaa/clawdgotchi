@@ -7,32 +7,28 @@ export function fmtTokens(n) {
   return String(Math.round(a))
 }
 
-export function plural(n, one, few, many) {
-  const mod10 = n % 10
-  const mod100 = n % 100
-  if (mod10 === 1 && mod100 !== 11) return one
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few
-  return many
-}
+const count = (n, one, many) => `${n} ${n === 1 ? one : many}`
 
 function ageText(born, now) {
   const days = Math.floor((now - born) / DAY_MS)
-  if (!(days >= 1)) return 'народився сьогодні'
-  return `${days} ${plural(days, 'день', 'дні', 'днів')}`
+  if (!(days >= 1)) return 'born today'
+  return count(days, 'day', 'days')
 }
 
-const pad = (n) => String(n).padStart(2, '0')
+function popsText(pops) {
+  if (pops === 0) return 'never'
+  if (pops === 1) return 'once'
+  return `${pops} times`
+}
 
 // stats: { born, sessions, eaten, pops, babies }, any of them missing on a fresh install.
 export function passportLines(stats, now) {
   const { born = now, sessions = 0, eaten = 0, pops = 0, babies = 0 } = stats
-  const clock = new Date(now)
   return [
-    `Вік: ${ageText(born, now)}`,
-    `Сесій: ${sessions}`,
-    `З’їв: ${fmtTokens(eaten)} токенів`,
-    `Лускав: ${pops} ${plural(pops, 'раз', 'рази', 'разів')}`,
-    `Дітей: ${babies}`,
-    `Годинник Clawd: ${pad(clock.getHours())}:${pad(clock.getMinutes())}`,
+    `Age: ${ageText(born, now)}`,
+    `Sessions: ${sessions}`,
+    `Ate: ${eaten === 1 ? '1 token' : `${fmtTokens(eaten)} tokens`}`,
+    `Popped: ${popsText(pops)}`,
+    `Babies: ${babies}`,
   ]
 }
