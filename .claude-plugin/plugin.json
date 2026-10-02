@@ -1,0 +1,12 @@
+{
+  "name": "clawdgotchi",
+  "displayName": "Clawdgotchi",
+  "version": "0.1.0",
+  "description": "A pixel Clawd above your prompt that grows with your context window and pops on /compact.",
+  "author": { "name": "Arthur Sereda", "url": "https://github.com/arthurseredaa" },
+  "homepage": "https://github.com/arthurseredaa/clawdgotchi",
+  "repository": "https://github.com/arthurseredaa/clawdgotchi",
+  "license": "MIT",
+  "keywords": ["mod", "context-window", "tamagotchi", "pixel-art"],
+  "types": "./types/index.d.ts"
+}

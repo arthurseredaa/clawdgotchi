@@ -1,0 +1,13 @@
+{
+  "name": "clawdgotchi",
+  "description": "Clawdgotchi: a pixel Clawd above your Claude Code prompt that tracks your context window.",
+  "owner": {
+    "name": "Arthur Sereda"
+  },
+  "plugins": [
+    {
+      "name": "clawdgotchi",
+      "source": "./"
+    }
+  ]
+}
