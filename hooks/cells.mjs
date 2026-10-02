@@ -18,10 +18,15 @@ export function cellOf(top, bottom) {
   return luminance(top) >= luminance(bottom) ? [UPPER_HALF, top, bottom] : [LOWER_HALF, bottom, top]
 }
 
-export function toCells(grid) {
+// glyphs: [{ x, row, ch, color }] written into whole cells over the pixels (row counts cells, not pixels).
+export function toCells(grid, glyphs = []) {
+  const at = new Map(glyphs.map((g) => [`${g.row}:${g.x}`, g]))
   const nums = []
   for (let r = 0; r + 1 < grid.length; r += 2) {
-    for (let c = 0; c < grid[r].length; c++) nums.push(...cellOf(grid[r][c], grid[r + 1][c]))
+    for (let c = 0; c < grid[r].length; c++) {
+      const g = at.get(`${r / 2}:${c}`)
+      nums.push(...(g ? [g.ch.codePointAt(0), g.color, DEFAULT_COLOR] : cellOf(grid[r][c], grid[r + 1][c])))
+    }
   }
   return toBase64(new Uint8Array(Uint32Array.from(nums).buffer))
 }

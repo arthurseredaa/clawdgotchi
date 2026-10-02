@@ -126,13 +126,6 @@ function drawClawd(g, o) {
   return { left, top, right: left + o.bw - 1 }
 }
 
-function drawZ(g, geo, t) {
-  const ph = Math.floor(t / 4) % 4
-  const x = geo.right + 2
-  const y = geo.top - ph
-  for (const [dx, dy] of [[0, 0], [1, 0], [2, 0], [1, 1], [0, 2], [1, 2], [2, 2]]) put(g, x + dx, y + dy, COLORS.z)
-}
-
 function drawCrumbs(g, geo, t) {
   const target = geo.right + 2
   const edge = g[0].length - 1
@@ -196,6 +189,23 @@ function drawPop(g, pt, t) {
   put(g, LEFT + STAGES[0].bw + 3, H - 1, COLORS.egg)
 }
 
+// Sleeping Clawd gets real letters, not pixels: "z z Z" climbing away from him one by one.
+// Glyphs are terminal cells: x is a column of the grid, row a cell row (two pixel rows).
+export function glyphsOf(scene, t) {
+  if (scene.mode !== 'sleep' || (scene.popT != null && scene.popT < POP_MS)) return []
+  const edge = baseWidth(scene)
+  const letters = [
+    { x: edge - 3, row: 2, ch: 'z', color: COLORS.z },
+    { x: edge - 2, row: 1, ch: 'z', color: COLORS.z },
+    { x: edge - 1, row: 0, ch: 'Z', color: COLORS.z },
+  ]
+  return letters.slice(0, Math.floor(t / 4) % 4)
+}
+
+export function mirrorGlyphs(glyphs, width) {
+  return glyphs.map((g) => ({ ...g, x: width - 1 - g.x }))
+}
+
 // Clawd lives in the right corner: flip the grid so he hugs the right edge and effects appear on his left.
 export function mirror(grid) {
   return grid.map((row) => [...row].reverse())
@@ -228,9 +238,14 @@ export function frame(scene, t) {
     o.armL = w
     o.armR = 1 - w
   }
-  if (m === 'sleep' || m === 'sleepy') {
+  if (m === 'sleepy') {
     o.eyes = 'closed'
     o.squash = Math.floor(t / 8) % 2
+  }
+  // Asleep he does not move at all; only the z letters do.
+  if (m === 'sleep') {
+    o.eyes = 'closed'
+    o.squash = 0
   }
   if (m === 'eat') {
     o.legBw = o.bw
@@ -239,7 +254,6 @@ export function frame(scene, t) {
   }
   o.blink = m !== 'sleep' && m !== 'sleepy' && s.eyes === 'dot' && t % 24 < 2 && t > 0
   const geo = drawClawd(g, o)
-  if (m === 'sleep') drawZ(g, geo, t)
   if (m === 'eat') drawCrumbs(g, geo, t)
   if (s.eyes === 'squint' && m !== 'sleep') put(g, geo.right + 2, geo.top + (Math.floor(t / 2) % 4), COLORS.sweat)
   return g

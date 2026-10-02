@@ -36,11 +36,17 @@ def rgb(c):
     return ((c >> 16) & 0xFF, (c >> 8) & 0xFF, c & 0xFF)
 
 
-def draw_grid(draw, grid, x, y, px=PX):
+def draw_grid(draw, shot, x, y, px=PX):
+    grid = shot["g"]
     for r, row in enumerate(grid):
         for c, color in enumerate(row):
             if color is not None:
                 draw.rectangle([x + c * px, y + r * px, x + (c + 1) * px - 1, y + (r + 1) * px - 1], fill=rgb(color))
+    # A glyph fills one terminal cell: one pixel column wide, two pixel rows tall.
+    f = font(int(px * 1.8))
+    for gl in shot.get("z", []):
+        cx, cy = x + gl["x"] * px + px / 2, y + gl["row"] * 2 * px + px
+        draw.text((cx, cy), gl["ch"], font=f, fill=rgb(gl["color"]), anchor="mm")
 
 
 def save_gif(path, frames):
@@ -52,8 +58,8 @@ def sprite_card(grid, width, height, right_margin=40):
     """A dark card with the sprite standing on its bottom edge, right-aligned like in the band."""
     im = Image.new("RGB", (width, height), BG)
     d = ImageDraw.Draw(im)
-    w = len(grid[0]) * PX
-    draw_grid(d, grid, width - right_margin - w, height - 30 - len(grid) * PX)
+    w = len(grid["g"][0]) * PX
+    draw_grid(d, grid, width - right_margin - w, height - 30 - len(grid["g"]) * PX)
     return im
 
 
@@ -69,7 +75,7 @@ def hero(frames):
         d = ImageDraw.Draw(im)
         d.text((24, 22), "● Refactored the retry loop and added a test for three retries.", font=f_small, fill=DIM)
         d.text((W - 52, 70), "[-]", font=f_small, fill=DIM)
-        w = len(grid[0]) * PX
+        w = len(grid["g"][0]) * PX
         draw_grid(d, grid, W - 64 - w, 72)
         d.line([(16, 168), (W - 16, 168)], fill=RULE, width=1)
         d.text((24, 178), ">", font=f_text, fill=TEXT)
@@ -87,9 +93,9 @@ def stages(grids):
     d = ImageDraw.Draw(im)
     f_big, f_small = font(16), font(14)
     for i, grid in enumerate(grids):
-        w = len(grid[0]) * PX
+        w = len(grid["g"][0]) * PX
         x0 = i * col + (col - w) // 2
-        draw_grid(d, grid, x0, 120 - len(grid) * PX)
+        draw_grid(d, grid, x0, 120 - len(grid["g"]) * PX)
         pct, name = labels[i]
         d.text((i * col + col // 2, 140), pct, font=f_big, fill=TEXT, anchor="mm")
         d.text((i * col + col // 2, 162), name, font=f_small, fill=DIM, anchor="mm")

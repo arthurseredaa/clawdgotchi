@@ -1,5 +1,5 @@
 import { atom, read, update } from 'claude-code'
-import { H, POP_MS, frame, widthOf, mirror } from './sprite.mjs'
+import { H, POP_MS, frame, widthOf, mirror, glyphsOf, mirrorGlyphs } from './sprite.mjs'
 import { toCells } from './cells.mjs'
 import { resolveScene, EAT_MS, HATCH_FROM, MAX_EGG_MS } from './scene.mjs'
 import { passportLines } from './passport.mjs'
@@ -62,6 +62,13 @@ async function sweepBabies($) {
   } catch {}
 }
 
+// The band shows Clawd mirrored into the right corner; the passport shows him as drawn.
+function cellsFor(scene, flip = true) {
+  const grid = frame(scene, t)
+  if (!flip) return toCells(grid, glyphsOf(scene, t))
+  return toCells(mirror(grid), mirrorGlyphs(glyphsOf(scene, t), grid[0].length))
+}
+
 async function setReading($, r) {
   percent = r.percent
   await update($, reading, () => r)
@@ -121,7 +128,7 @@ async function tick($) {
         key: SPRITE_KEY,
         columns: mountedColumns,
         rows: ROWS,
-        cells: toCells(mirror(frame(scene, t))),
+        cells: cellsFor(scene),
       })
     } catch {
       res = { deny: 'blit threw' }
@@ -218,7 +225,7 @@ export function register(on) {
     const info = Box({ flexDirection: 'column', children: lines })
     if (e.surface !== 'terminal') return info
     const scene = sceneAt(now, percent)
-    const portrait = Raster({ key: 'clawd-portrait', columns: widthOf(scene), rows: ROWS, cells: toCells(frame(scene, t)) })
+    const portrait = Raster({ key: 'clawd-portrait', columns: widthOf(scene), rows: ROWS, cells: cellsFor(scene, false) })
     return Box({ flexDirection: 'row', columnGap: 2, children: [portrait, info] })
   })
 
@@ -308,7 +315,7 @@ export function register(on) {
       justifyContent: 'flex-end',
       // Leave room for the engine's [-] collapse control in the band's top-right corner.
       width: Math.max(columns, e.props.bodyColumns - COLLAPSE_COLUMNS),
-      children: [Raster({ key: SPRITE_KEY, columns, rows: ROWS, cells: toCells(mirror(frame(scene, t))) })],
+      children: [Raster({ key: SPRITE_KEY, columns, rows: ROWS, cells: cellsFor(scene) })],
     })
     bandRequestId = e.requestId
     mountedColumns = columns

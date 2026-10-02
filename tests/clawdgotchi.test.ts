@@ -302,12 +302,16 @@ test('/clawd opens a passport that remembers across sessions', async ($, on) => 
 })
 
 test('in the small hours Clawd sleeps even while Claude works', async ($, on) => {
-  mock.clock(on, { now: new Date(2026, 9, 2, 3, 0).getTime() })
+  const clock = mock.clock(on, { now: new Date(2026, 9, 2, 3, 0).getTime() })
   stubs(on, { tokens: 20000 })
+  on('ui.blit', () => ({ value: {} }))
   await $.session.start(START)
   await $.turn.start({ turnId: 't1' })
+  await clock.advance(1600)
   const ui = await $.ui.mount(BAND)
-  expect((await sprite(ui)).cells.includes(COLORS.z)).toBe(true)
+  const { cells } = await sprite(ui)
+  expect(cells.includes('z'.codePointAt(0)!)).toBe(true)
+  expect(cells.includes('Z'.codePointAt(0)!)).toBe(true)
   await ui.unmount()
 })
 

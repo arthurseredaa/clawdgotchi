@@ -1,5 +1,5 @@
 import { expect, test } from 'claude-code/testing'
-import { H, STAGES, COLORS, POP_WIDTH, BABY_SLOT, stageOf, frame, widthOf, mirror } from '../hooks/sprite.mjs'
+import { H, STAGES, COLORS, POP_WIDTH, BABY_SLOT, stageOf, frame, widthOf, mirror, glyphsOf, mirrorGlyphs } from '../hooks/sprite.mjs'
 
 const MODES = ['idle', 'work', 'sleep', 'eat', 'sleepy'] as const
 const mask = (row: (number | null)[]) => row.map((c) => (c == null ? 0 : 1)).join('')
@@ -107,4 +107,33 @@ test('a baby has a whole head: a solid top row, eyes one row below', () => {
   expect(g[H - 3][x0 + 1]).toBe(COLORS.eye)
   expect(g[H - 3][x0 + 3]).toBe(COLORS.eye)
   expect(g[H - 5].slice(x0, x0 + 5).every((c) => c == null)).toBe(true)
+})
+
+test('sleeping shows real z letters beside him, not a pixel blob', () => {
+  const scene = { stage: 0, mode: 'sleep', popT: null }
+  const w = widthOf(scene)
+  const seen = new Set<string>()
+  for (let t = 0; t < 32; t++) {
+    expect(pixels(frame(scene, t), COLORS.z).length).toBe(0)
+    for (const g of glyphsOf(scene, t)) {
+      seen.add(g.ch)
+      expect(g.row >= 0 && g.row < H / 2).toBe(true)
+      expect(g.x >= w - 3 && g.x < w).toBe(true)
+    }
+  }
+  expect([...seen].sort()).toEqual(['Z', 'z'])
+  expect(glyphsOf(scene, 12).map((g) => g.ch)).toEqual(['z', 'z', 'Z'])
+  expect(glyphsOf({ stage: 0, mode: 'idle', popT: null }, 12)).toEqual([])
+  expect(glyphsOf({ stage: 0, mode: 'sleepy', popT: null }, 12)).toEqual([])
+})
+
+test('mirrored glyphs move to the other side', () => {
+  expect(mirrorGlyphs([{ x: 14, row: 1, ch: 'z', color: 1 }], 16)).toEqual([{ x: 1, row: 1, ch: 'z', color: 1 }])
+})
+
+test('asleep, his body stays perfectly still', () => {
+  for (let stage = 0; stage < 4; stage++) {
+    const still = mask(frame({ stage, mode: 'sleep', popT: null }, 0).flat())
+    for (let t = 1; t < 48; t++) expect(mask(frame({ stage, mode: 'sleep', popT: null }, t).flat())).toBe(still)
+  }
 })

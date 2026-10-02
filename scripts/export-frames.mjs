@@ -1,9 +1,14 @@
 // Prints the pixel frames the README media is rendered from, as JSON on stdout.
 // Usage: node scripts/export-frames.mjs > frames.json  (scripts/render-media.py runs it for you)
-import { frame, mirror, POP_MS } from '../hooks/sprite.mjs'
+import { frame, mirror, glyphsOf, mirrorGlyphs, POP_MS } from '../hooks/sprite.mjs'
 import { passportLines } from '../hooks/passport.mjs'
 
-const shot = (scene, t, flip = true) => (flip ? mirror(frame(scene, t)) : frame(scene, t))
+// One frame: pixel grid g plus glyph cells z ("z z Z" while asleep), mirrored into the right corner like the band.
+function shot(scene, t, flip = true) {
+  const g = frame(scene, t)
+  const z = glyphsOf(scene, t)
+  return flip ? { g: mirror(g), z: mirrorGlyphs(z, g[0].length) } : { g, z }
+}
 const run = (scene, from, count) => Array.from({ length: count }, (_, i) => shot(scene, from + i))
 
 // The pop as the mod plays it: burst, the egg wobbling while the compaction runs, then the hatch.

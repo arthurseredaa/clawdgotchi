@@ -34,7 +34,7 @@ His feet never leave the ground: only the body moves.
 
 ![Three subagent babies next to Clawd](docs/media/babies.gif)
 
-**Night owl.** From 23:00 he gets sleepy. From 02:00 to 06:00 he dozes off even while Claude works. After 5 idle minutes he sleeps at any hour.
+**Sleep and night owl.** After 5 idle minutes he falls asleep at any hour: he lies perfectly still while `z z Z` float up beside him, and your next prompt wakes him. From 23:00 he gets sleepy, and from 02:00 to 06:00 he dozes off even while Claude works.
 
 ![Sleepy, then asleep](docs/media/night.gif)
 

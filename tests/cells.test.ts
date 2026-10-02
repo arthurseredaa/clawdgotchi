@@ -32,3 +32,11 @@ test('toCells packs 8x20 pixels into 4x20 cells', () => {
   expect(n.slice(-3)).toEqual([0x2584, 0xcccccc, DEFAULT_COLOR])
   expect(n[3]).toBe(0x20)
 })
+
+test('glyphs are written into their cells over the pixels', () => {
+  const g = empty()
+  g[0][0] = 0xaaaaaa
+  const n = decode(toCells(g, [{ x: 0, row: 0, ch: 'z', color: 0xbdb7cc }, { x: 2, row: 3, ch: 'Z', color: 0xbdb7cc }]))
+  expect(n.slice(0, 3)).toEqual([0x7a, 0xbdb7cc, DEFAULT_COLOR])
+  expect(n.slice((3 * 20 + 2) * 3, (3 * 20 + 2) * 3 + 3)).toEqual([0x5a, 0xbdb7cc, DEFAULT_COLOR])
+})
